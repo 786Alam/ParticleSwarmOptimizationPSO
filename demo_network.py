@@ -111,8 +111,8 @@ def load_route_from_xml(xml_file, route_id):
 def calculate_individual_interaction_score(vehicle_id, all_vehicle_ids):
     interaction_score = 0
     MIN_FOLLOW_DISTANCE = 100
-    MIN_LEADER_DISTANCE = 2
-    MIN_LANE_CHANGE_DISTANCE = 2
+    MIN_LEADER_DISTANCE = 100
+    MIN_LANE_CHANGE_DISTANCE = 100
     MAX_SPEED_DIFF = 5
 
     if vehicle_id not in traci.vehicle.getIDList():
@@ -122,112 +122,123 @@ def calculate_individual_interaction_score(vehicle_id, all_vehicle_ids):
     vehicle_type = traci.vehicle.getTypeID(vehicle_id).split('@')[0]
 
 
-   # Check for too close following normal vehicle
+    # Check for too close following normal vehicle
     follower_id, _ = traci.vehicle.getFollower(vehicle_id)
     if follower_id and follower_id in traci.vehicle.getIDList():
         x2, y2 = traci.vehicle.getPosition(follower_id)
         distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
         follower_type = traci.vehicle.getTypeID(follower_id).split('@')[0]
 
-        # Get the Distance of the autonomous vehicle
-        vehicle_distance = traci.vehicle.getDistance(vehicle_id)
-        follower_distance = traci.vehicle.getDistance(follower_id)
-
-        # Get the distance difference of the autonomous vehicle
-        distance_difference = vehicle_distance - follower_distance
-        print(f"Distance Difference between autonomous vehicle {vehicle_id} and follower vehicle {follower_id}:{distance_difference}\n")
-
-        # Get the speed of the autonomous vehicle
-        vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
-        follower_speed = traci.vehicle.getSpeed(follower_id)
-
-        # Get the distance difference of the autonomous vehicle
-        speed_difference = vehicle_speed - follower_speed
-        print(f"Speed Difference between autonomous vehicle {vehicle_id} and follower {follower_id}:{speed_difference}\n")
-
-        
-
         if vehicle_type == 'auto' and follower_type == 'car':
-            if distance_difference <= MIN_FOLLOW_DISTANCE:
-                print(f"Autonomous Vehicle {vehicle_id} is too close to Following Vehicle ({follower_distance}),\n distance: {distance_difference}\n")
-                # If autonomou s vehicle speed is greater than or equal to 5, decrease speed by 1
-                if vehicle_speed <= 2:
-                    interaction_score -= 1
-                    traci.vehicle.setSpeed(vehicle_id, vehicle_speed + 2)
-                    print(f"Autonomous Vehicle {vehicle_id} increased speed to {vehicle_speed + 2} m/s.")
 
-                    # Calculate new distance
-                    new_distance = distance_difference + 10
-                    print(f"Autonomous Vehicle {vehicle_id} increased distance from Following Normal Vehicle, new distance from Following Normal Vehicle: {new_distance}\n \n \n")
+            # Get the Distance of the autonomous vehicle
+            vehicle_distance = traci.vehicle.getDistance(vehicle_id)
+            follower_distance = traci.vehicle.getDistance(follower_id)
+
+            # Get the distance difference of the autonomous vehicle
+            distance_difference = vehicle_distance - follower_distance
+            distance_difference = abs(distance_difference)
+            print(f"Distance Difference between Autonomous vehicle{vehicle_id} and follower Normal vehicle{follower_id}: {distance_difference} m.\n") 
+
+            # Get the speed of the autonomous vehicle
+            vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
+            follower_speed = traci.vehicle.getSpeed(follower_id)
+
+            # Get the distance difference of the autonomous vehicle
+            speed_difference = vehicle_speed - follower_speed
+            speed_difference = abs(speed_difference)
+            print(f"Speed Difference between Autonomous vehicle{vehicle_id} and follower Normal vehicle{follower_id}: {speed_difference} km/h.\n")
+
+            if vehicle_type == 'auto' and follower_type == 'car':
+                if distance_difference <= MIN_FOLLOW_DISTANCE:
+                    print(f"Autonomous Vehicle {vehicle_id} is too close to Following Normal Vehicle({follower_id}),\n distance: {distance_difference} m.\n") 
+                    # If autonomous vehicle speed is greater than or equal to 5, decrease speed by 1
+                    if vehicle_speed <= 2:
+                        print(f"Autonomous Vehicle{vehicle_id} increased speed to {vehicle_speed + 2} km/h.\n") 
+                        # Calculate new distance
+                        new_distance = distance_difference + 10
+                        print( f"Autonomous Vehicle{vehicle_id} increased distance from Following Normal Vehicle, new distance from Following Normal Vehicle: {new_distance} m.\n")
+                    else:
+                        print(f"Autonomous Vehicle{vehicle_id} actual speed is {vehicle_speed} km/h, maintaining distance.\n") 
+                        # new_distance = traci.vehicle.getDistance(vehicle_id)
+                        print(f"Autonomous Vehicle{vehicle_id} maintaining distance from Following Normal Vehicle distance: {distance_difference} m. \n \n \n") 
                 else:
-                    interaction_score += 1
-                    # If autonomous vehicle speed is less than 5, print actual speed and maintain distance
-                    print(f"Autonomous Vehicle {vehicle_id} actual speed is {vehicle_speed} m/s, maintaining distance.")
-                    # new_distance = traci.vehicle.getDistance(vehicle_id)
-                    print(f"Autonomous Vehicle {vehicle_id} maintaining distance from Following Normal Vehicle distance: {distance_difference}\n \n \n")
+                    pass
             else:
                 pass
         else:
             pass
+    else:
+        pass
 
-   # Check for too close leading autonomous vehicle
-        leader_id_info = traci.vehicle.getLeader(vehicle_id)
-        if leader_id_info is not None:
-            leader_id, leader_distance = leader_id_info
-            if leader_id in traci.vehicle.getIDList():
-                leader_type = traci.vehicle.getTypeID(leader_id).split('@')[0]
-                
+    # Check for too close leading autonomous vehicle
+    leader_id_info = traci.vehicle.getLeader(vehicle_id)
+    if leader_id_info is not None:
+        leader_id, leader_distance = leader_id_info
+        if leader_id in traci.vehicle.getIDList():
+            leader_type = traci.vehicle.getTypeID(leader_id).split('@')[0]
+
+            if vehicle_type == 'auto' and leader_type == 'auto':
+
+                # Get the Distance of the autonomous vehicle
+                vehicle_distance = traci.vehicle.getDistance(vehicle_id)
+                leader_distance = traci.vehicle.getDistance(leader_id)
+
+                # Get the distance difference of the autonomous vehicle
+                distance_difference = vehicle_distance - leader_distance
+                distance_difference = abs(distance_difference)
+                print(f"Distance Difference between Autonomous vehicle{vehicle_id} and Leading Autonomous vehicle{leader_id}: {distance_difference} m.\n")
+
                 # Get the speed of the autonomous vehicle
                 vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
+                leader_speed = traci.vehicle.getSpeed(leader_id)
 
-                if leader_distance <= MIN_LEADER_DISTANCE:
-                    print(f"Autonomous Vehicle {vehicle_id} is too close to the Leading Autonomous Vehicle ({leader_id}),\n distance: {leader_distance}\n")
-                    # If autonomous vehicle speed is greater than or equal to 18, decrease speed to 18
-                    if vehicle_speed >= 2:
-                        interaction_score -= 1
-                        traci.vehicle.setSpeed(vehicle_id, 18.0)
-                        print(f"Setting speed of vehicle {vehicle_id} to 18.0")
+                # Get the distance difference of the autonomous vehicle
+                speed_difference = vehicle_speed - leader_speed
+                speed_difference = abs(speed_difference)
+                print(f"Speed Difference between Autonomous vehicle {vehicle_id} and Leader Autonomous Vehicle{leader_id}: {speed_difference} km/h.\n") 
 
-                        # Calculate new distance
-                        new_leader_distance = leader_distance + 2
-                        print(f"Autonomous Vehicle {vehicle_id} increased distance from Leading Autonomous Vehicle, new distance: {new_leader_distance}\n \n \n")
+
+                if vehicle_type == 'auto' and leader_type == 'car':
+                    if distance_difference <= MIN_LEADER_DISTANCE:
+                        print(f"Autonomous Vehicle {vehicle_id} is too close to the Leading Vehicle({leader_id}),\n distance: {distance_difference} m.\n") 
+                        # If autonomous vehicle speed is greater than or equal to 18, decrease speed to 18
+                        if vehicle_speed >= 2:
+                            print(f"Autonomous Vehicle {vehicle_id} decreased speed to {vehicle_speed - 1} km/h.\n") 
+                            # Calculate new distance
+                            new_leader_distance = distance_difference + 10
+                            print(f"Autonomous Vehicle {vehicle_id} increased distance from Leading Autonomous Vehicle{leader_id}, new distance: {new_leader_distance} m.\n") 
+                        else:
+                            print(f"Autonomous Vehicle {vehicle_id} actual speed is {vehicle_speed} km/h, maintaining distance.\n") 
+                            # new_leader_distance = traci.vehicle.getDistance(vehicle_id)
+                            print(f"Autonomous Vehicle {vehicle_id} maintaining distance From Leading Autonomous Vehicle{leader_id}: {distance_difference} km/h.\n \n \n") 
                     else:
-                        interaction_score += 1
-                        # If speed is less than 18, print actual speed and maintain distance
-                        print(f"Autonomous Vehicle {vehicle_id} actual speed is {vehicle_speed} m/s, maintaining distance.")
-                        # new_leader_distance = traci.vehicle.getDistance(vehicle_id)
-                        print(f"Autonomous Vehicle {vehicle_id} maintaining distance From Leading Autonomous Vehicle: {leader_distance}\n \n \n")
+                        pass
                 else:
-                    pass  
+                    pass
 
-                    # # Check if the autonomous vehicle is blocked and change lane
-                    # if not traci.vehicle.getNextTLS(vehicle_id) and not traci.vehicle.getLaneChangeState(vehicle_id):
-                    #     # Get the best lane information
-                    #     best_lanes = traci.vehicle.getBestLanes(vehicle_id)
-                    #     if best_lanes:
-                    #         best_lane_id = best_lanes[0][0]  # Choose the first best lane
-                    #         current_lane_id = traci.vehicle.getLaneID(vehicle_id)
-                    #         if best_lane_id != current_lane_id:
-                    #             print(f"Autonomous Vehicle {vehicle_id} is blocked. Changing lane to {best_lane_id}.")
-                    #             traci.vehicle.changeLane(vehicle_id, best_lane_id, 10.0)  # Change to the best lane
-                    #             traci.simulationStep()  # Allow the simulation to process the lane change
-                    #             print(f"{vehicle_id} changed lane to {best_lane_id} to increase distance from Leading Autonomous Vehicle\n \n \n")
-
-            # Check for significantly faster leading autonomous vehicle
-            vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
-            leader_speed = traci.vehicle.getSpeed(leader_id)
-            speed_difference = vehicle_speed - leader_speed
-            if speed_difference > MAX_SPEED_DIFF:
-                leader_type = traci.vehicle.getTypeID(leader_id).split('@')[0]
+                # Check for significantly faster leading autonomous vehicle
+                vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
+                leader_speed = traci.vehicle.getSpeed(leader_id)
+                speed_difference = vehicle_speed - leader_speed
                 if vehicle_type == 'auto' and leader_type == 'auto':
-                    interaction_score += 1
-                    print(f"Autonomous Vehicle {vehicle_id} is significantly faster than the Leading Autonomous Vehicle ({leader_id}),\n speed difference: {speed_difference}\n")
-                    # traci.vehicle.setSpeed(vehicle_id, 5.0)  # Set speed to increase distance
-                    # new_speed_difference = vehicle_speed - traci.vehicle.getSpeed(leader_id)
-                    # print(f"Autonomous Vehicle {vehicle_id} increased distance from significantly faster than Leading Autonomous Vehicle, new speed difference: {new_speed_difference}\n \n \n")
-
+                    if speed_difference > MAX_SPEED_DIFF:
+                        leader_type = traci.vehicle.getTypeID(leader_id).split('@')[0]
+                        if vehicle_type == 'auto' and leader_type == 'auto':
+                            print(f"Autonomous Vehicle {vehicle_id} is significantly faster than the Leading Autonomous Vehicle({leader_id}),\n speed difference: {speed_difference} km/h.\n") 
+                            # traci.vehicle.setSpeed(vehicle_id, 5.0)  # Set speed to increase distance
+                            # new_speed_difference = vehicle_speed - traci.vehicle.getSpeed(leader_id)
+                            # info += f"Autonomous Vehicle {vehicle_id} increased distance from significantly faster than Leading Autonomous Vehicle, new speed difference: {new_speed_difference}\n \n \n"
+                        else:
+                            pass
+                    else:
+                        pass
+                else:
+                    pass
         else:
             pass
+    else:
+        pass
 
     # Check for too close neighbor normal vehicle in a different lane
     neighbors = traci.vehicle.getNeighbors(vehicle_id, 5)
@@ -236,43 +247,58 @@ def calculate_individual_interaction_score(vehicle_id, all_vehicle_ids):
             x2, y2 = traci.vehicle.getPosition(neighbor_id)
             distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
             neighbor_type = traci.vehicle.getTypeID(neighbor_id).split('@')[0]
-            
-            # Get the speed of the autonomous vehicle
-            vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
 
             if vehicle_type == 'auto' and neighbor_type == 'car':
-                if distance < MIN_LANE_CHANGE_DISTANCE:
-                    interaction_score += 1
-                    print(f"Autonomous Vehicle {vehicle_id} is too close to a Neighbor Normal Vehicle ({neighbor_id}) in a different lane,\n distance: {distance}\n")
 
-                    # If autonomous vehicle speed is greater than or equal to 25, decrease speed by 1
-                    if vehicle_speed >= 2:
-                        traci.vehicle.setSpeed(vehicle_id, vehicle_speed - 5)
-                        print(f"Autonomous Vehicle {vehicle_id} decreased speed to {vehicle_speed - 5} m/s.")
+                # Get the Distance of the autonomous vehicle
+                vehicle_distance = traci.vehicle.getDistance(vehicle_id)
+                neighbor_distance = traci.vehicle.getDistance(neighbor_id)
 
-                        # Calculate new distance
-                        new_distance = traci.vehicle.getDistance(vehicle_id) + 2
-                        print(f"Autonomous Vehicle {vehicle_id} increased distance from Neighbor Normal Vehicle in a different lane, new distance: {new_distance}\n \n \n")
-                    else:
-                        # If autonomous vehicle speed is less than 25, print actual speed and maintain distance
-                        print(f"Autonomous Vehicle {vehicle_id} actual speed is {vehicle_speed} m/s, maintaining distance.")
-                        new_distance = traci.vehicle.getDistance(vehicle_id)
-                        print(f"Autonomous Vehicle {vehicle_id} new distance: {new_distance}\n \n \n")
+                # Get the distance difference of the autonomous vehicle
+                distance_difference = vehicle_distance - neighbor_distance
+                distance_difference = abs(distance_difference)
+                print(f"Distance Difference between Autonomous vehicle{vehicle_id} and Neighboring Normal vehicle{neighbor_id}: {distance_difference} m.\n") 
 
-                    # Check if the autonomous vehicle is blocked and change lane
-                    if not traci.vehicle.getNextTLS(vehicle_id) and not traci.vehicle.getLaneChangeState(vehicle_id):
-                        # Get the best lane information
-                        best_lanes = traci.vehicle.getBestLanes(vehicle_id)
-                        if best_lanes:
-                            best_lane_id = best_lanes[0][0]  # Choose the first best lane
-                            current_lane_id = traci.vehicle.getLaneID(vehicle_id)
-                            if best_lane_id != current_lane_id:
-                                print(f"Autonomous Vehicle {vehicle_id} is blocked. Changing lane to {best_lane_id}.")
-                                traci.vehicle.changeLane(vehicle_id, best_lane_id, 10.0)  # Change to the best lane
-                                traci.simulationStep()  # Allow the simulation to process the lane change
-                                print(f"{vehicle_id} changed lane to {best_lane_id} to increase distance from Neighbor Normal Vehicle in a different lane\n \n \n")
+                # Get the speed of the autonomous vehicle
+                vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
+                neighbor_speed = traci.vehicle.getSpeed(neighbor_id)
 
-   # Check for blocked by normal vehicle
+                # Get the distance difference of the autonomous vehicle
+                speed_difference = vehicle_speed - neighbor_speed
+                speed_difference = abs(speed_difference)
+                print(f"Speed Difference between Autonomous vehicle{vehicle_id} and Neighboring Normal vehicle{neighbor_id}: {speed_difference} km/h.\n") 
+
+                if vehicle_type == 'auto' and neighbor_type == 'car':
+                    if distance_difference < MIN_LANE_CHANGE_DISTANCE:
+                        print(f"Autonomous Vehicle{vehicle_id} is too close to a Neighbor Normal Vehicle({neighbor_id}) in a different lane,\n distance: {distance_difference} m.\n") 
+
+                        # If autonomous vehicle speed is greater than or equal to 25, decrease speed by 1
+                        if vehicle_speed >= 2:
+                            traci.vehicle.setSpeed(vehicle_id, vehicle_speed + 1)
+                            print(f"Autonomous Vehicle{vehicle_id} increased speed to {vehicle_speed + 1} km/h.\n") 
+                            # Calculate new distance
+                            new_distance = speed_difference + 10
+                            print(f"Autonomous Vehicle{vehicle_id} increased distance from Neighbor Normal Vehicle in a different lane, new distance: {new_distance} m.\n \n \n") 
+                        else:
+                            # If autonomous vehicle speed is less than 25, print actual speed and maintain distance
+                            print(f"Autonomous Vehicle{vehicle_id} actual speed is {vehicle_speed} m/s, maintaining distance.\n") 
+                            # new_distance = traci.vehicle.getDistance(vehicle_id)
+                            print(f"Autonomous Vehicle{vehicle_id} maintaining distance from Neighbor Normal vehicle, Distance: {distance_difference} m.\n \n \n") 
+
+                        # Check if the autonomous vehicle is blocked and change lane
+                        if not traci.vehicle.getNextTLS(vehicle_id) and not traci.vehicle.getLaneChangeState(vehicle_id, 0):  # 0 corresponds to 'left'
+                            # Get the best lane information
+                            best_lanes = traci.vehicle.getBestLanes(vehicle_id)
+                            if best_lanes:
+                                best_lane_id = best_lanes[0][0]  # Choose the first best lane
+                                best_lane_direction = best_lanes[0][2]  # Direction information
+                                current_lane_id = traci.vehicle.getLaneID(vehicle_id)
+                                if best_lane_id != current_lane_id:
+                                    print(f"Autonomous Vehicle {vehicle_id} is blocked. Changing lane to {best_lane_id}.\n") 
+                                    traci.vehicle.changeLane(vehicle_id, best_lane_id, 10.0)  # Change to the best lane
+                                    traci.simulationStep()  # Allow the simulation to process the lane change
+                                    print(f"{vehicle_id} changed lane to {best_lane_id} in direction {best_lane_direction} to increase distance from Neighbor Normal Vehicle in a different lane\n \n \n") 
+
     blockers = traci.vehicle.getNeighbors(vehicle_id, 1)
     for blocker_id, _ in blockers:
         if blocker_id != vehicle_id and blocker_id in traci.vehicle.getIDList():
@@ -281,25 +307,7 @@ def calculate_individual_interaction_score(vehicle_id, all_vehicle_ids):
             blocker_type = traci.vehicle.getTypeID(blocker_id).split('@')[0]
             if vehicle_type == 'auto' and blocker_type == 'car':
                 interaction_score += 1
-                print(f"Autonomous Vehicle {vehicle_id} is blocked by Normal Vehicle {blocker_id},\n distance: {distance}\n")
-                traci.vehicle.setSpeed(vehicle_id, 5.0)  # Set speed to increase distance
-                blocker_x, blocker_y = traci.vehicle.getPosition(blocker_id)
-                new_distance = new_distance = traci.vehicle.getDistance(blocker_id)
-
-                print(f"Autonomous Vehicle {vehicle_id} increased distance from blocked normal vehicle, new distance: {new_distance}\n \n \n")
-
-                # Check if the autonomous vehicle is blocked and change lane
-                if not traci.vehicle.getNextTLS(vehicle_id) and not traci.vehicle.getLaneChangeState(vehicle_id, 0): 
-                    # Get the best lane information
-                    best_lanes = traci.vehicle.getBestLanes(vehicle_id)
-                    if best_lanes:
-                        best_lane_id = best_lanes[0][0]  # Choose the first best lane
-                        current_lane_id = traci.vehicle.getLaneID(vehicle_id)
-                        if best_lane_id != current_lane_id:
-                            print(f"Autonomous Vehicle {vehicle_id} is blocked. Changing lane to {best_lane_id}.")
-                            traci.vehicle.changeLane(vehicle_id, best_lane_id, 10.0)  # Change to the best lane
-                            traci.simulationStep()  # Allow the simulation to process the lane change
-                            print(f"{vehicle_id} changed lane to {best_lane_id} to increase distance from blocked normal vehicle\n \n \n")
+                print(f"Autonomous Vehicle{vehicle_id} is blocked by Normal Vehicle{blocker_id},\n distance: {distance} m.\n")
 
 
     return interaction_score
@@ -414,9 +422,9 @@ def fitness_function(step, particle, particle_best_fitness, particle_best_positi
 
 
 def get_interaction_info(vehicle_id):
-    MIN_FOLLOW_DISTANCE = 2
-    MIN_LEADER_DISTANCE = 2
-    MIN_LANE_CHANGE_DISTANCE = 2
+    MIN_FOLLOW_DISTANCE = 100
+    MIN_LEADER_DISTANCE = 100
+    MIN_LANE_CHANGE_DISTANCE = 100
     MAX_SPEED_DIFF = 5
 
     info = ""
@@ -424,50 +432,186 @@ def get_interaction_info(vehicle_id):
     if vehicle_id not in traci.vehicle.getIDList():
         return info  # Return an empty string if the vehicle is not known
 
-    # Get the vehicle type and check if it starts with "auto"
-    vehicle_type_with_prefix = traci.vehicle.getTypeID(vehicle_id)
-    if vehicle_type_with_prefix.startswith('auto'):
-        x1, y1 = 0, 0  # Initialize with default values
-        follower_id, _ = traci.vehicle.getFollower(vehicle_id)
-        if follower_id and follower_id in traci.vehicle.getIDList():
-            x1, y1 = traci.vehicle.getPosition(vehicle_id)
-            x2, y2 = traci.vehicle.getPosition(follower_id)
-            distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
-            follower_type = traci.vehicle.getTypeID(follower_id).split('@')[0]
-            info += f"Autonomous Vehicle {vehicle_id} is too close to the Following Normal Vehicle ({follower_id}),\n distance: {distance}\n"
+    x1, y1 = traci.vehicle.getPosition(vehicle_id)
+    vehicle_type = traci.vehicle.getTypeID(vehicle_id).split('@')[0]
 
-        leader_id_info = traci.vehicle.getLeader(vehicle_id)
-        if leader_id_info is not None:
-            leader_id, leader_distance = leader_id_info
-            if leader_id in traci.vehicle.getIDList():
-                if leader_distance < MIN_LEADER_DISTANCE:
-                    leader_type = traci.vehicle.getTypeID(leader_id).split('@')[0]
-                    info += f"Autonomous Vehicle {vehicle_id} is too close to the Leading Autonomous Vehicle ({leader_id}),\n distance: {leader_distance}\n"
+    # Check for too close following normal vehicle
+    follower_id, _ = traci.vehicle.getFollower(vehicle_id)
+    if follower_id and follower_id in traci.vehicle.getIDList():
+        x2, y2 = traci.vehicle.getPosition(follower_id)
+        distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+        follower_type = traci.vehicle.getTypeID(follower_id).split('@')[0]
 
+        if vehicle_type == 'auto' and follower_type == 'car':
+
+            # Get the Distance of the autonomous vehicle
+            vehicle_distance = traci.vehicle.getDistance(vehicle_id)
+            follower_distance = traci.vehicle.getDistance(follower_id)
+
+            # Get the distance difference of the autonomous vehicle
+            distance_difference = vehicle_distance - follower_distance
+            distance_difference = abs(distance_difference)
+            info += f"Distance Difference between vehicle{vehicle_id} and follower Normal vehicle{follower_id}: {distance_difference} m.\n"
+
+            # Get the speed of the autonomous vehicle
+            vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
+            follower_speed = traci.vehicle.getSpeed(follower_id)
+
+            # Get the distance difference of the autonomous vehicle
+            speed_difference = vehicle_speed - follower_speed
+            speed_difference = abs(speed_difference)
+            info += f"Speed Difference between vehicle{vehicle_id} and follower Normal Vehicle{follower_id}: {speed_difference} km/h.\n"
+
+            if vehicle_type == 'auto' and follower_type == 'car':
+                if distance_difference <= MIN_FOLLOW_DISTANCE:
+                    info += f"Autonomous Vehicle{vehicle_id} is too close to Following Normal Vehicle({follower_id}),\n distance: {distance_difference} m.\n"
+                    # If autonomous vehicle speed is greater than or equal to 5, decrease speed by 1
+                    if vehicle_speed <= 2:
+                        info += f"Autonomous Vehicle{vehicle_id} increased speed to {vehicle_speed + 2} km/h.\n"
+                        # Calculate new distance
+                        new_distance = distance_difference + 10
+                        info += f"Autonomous Vehicle{vehicle_id} increased distance from Following Normal Vehicle, new distance from Following Normal Vehicle{follower_id}: {new_distance} m.\n"
+                    else:
+                        info += f"Autonomous Vehicle{vehicle_id} actual speed is {vehicle_speed} km/h, maintaining distance.\n"
+                        # new_distance = traci.vehicle.getDistance(vehicle_id)
+                        info += f"Autonomous Vehicle{vehicle_id} maintaining distance from Following Normal Vehicle distance: {distance_difference} m.\n \n \n"
+                else:
+                    pass
+            else:
+                pass
+        else:
+            pass
+    else:
+        pass
+    # Check for too close leading autonomous vehicle
+    leader_id_info = traci.vehicle.getLeader(vehicle_id)
+    if leader_id_info is not None:
+        leader_id, leader_distance = leader_id_info
+        if leader_id in traci.vehicle.getIDList():
+            leader_type = traci.vehicle.getTypeID(leader_id).split('@')[0]
+
+            if vehicle_type == 'auto' and leader_type == 'auto':
+
+                # Get the Distance of the autonomous vehicle
+                vehicle_distance = traci.vehicle.getDistance(vehicle_id)
+                leader_distance = traci.vehicle.getDistance(leader_id)
+
+                # Get the distance difference of the autonomous vehicle
+                distance_difference = vehicle_distance - leader_distance
+                distance_difference = abs(distance_difference)
+                info += f"Distance Difference between vehicle{vehicle_id} and Leading Autonomous vehicle{leader_id}:{distance_difference} m.\n"
+
+                # Get the speed of the autonomous vehicle
+                vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
+                leader_speed = traci.vehicle.getSpeed(leader_id)
+
+                # Get the distance difference of the autonomous vehicle
+                speed_difference = vehicle_speed - leader_speed
+                speed_difference = abs(speed_difference)
+                info += f"Speed Difference between vehicle{vehicle_id} and Leading Autonomous Vehicle{leader_id}:{speed_difference} km/h.\n"
+
+
+                if vehicle_type == 'auto' and leader_type == 'car':
+                    if distance_difference <= MIN_LEADER_DISTANCE:
+                        info += f"Autonomous Vehicle{vehicle_id} is too close to the Leading Autonomous Vehicle({leader_id}),\n distance: {leader_distance} m.\n"
+                        # If autonomous vehicle speed is greater than or equal to 18, decrease speed to 18
+                        if vehicle_speed >= 2:
+                            info += f"Autonomous Vehicle{vehicle_id} decreased speed to {vehicle_speed - 1} km/h.\n"
+                            # Calculate new distance
+                            new_leader_distance = distance_difference + 10
+                            info += f"Autonomous Vehicle{vehicle_id} increased distance from Leading Autonomous Vehicle, new distance: {new_leader_distance} m.\n"
+                        else:
+                            info += f"Autonomous Vehicle{vehicle_id} actual speed is {vehicle_speed} m/s, maintaining distance.\n"
+                            # new_leader_distance = traci.vehicle.getDistance(vehicle_id)
+                            info += f"Autonomous Vehicle{vehicle_id} maintaining distance From Leading Autonomous Vehicle: {leader_distance} m.\n \n \n"
+                    else:
+                        pass
+                else:
+                    pass
+
+                # Check for significantly faster leading autonomous vehicle
                 vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
                 leader_speed = traci.vehicle.getSpeed(leader_id)
                 speed_difference = vehicle_speed - leader_speed
-                if speed_difference > MAX_SPEED_DIFF:
-                    leader_type = traci.vehicle.getTypeID(leader_id).split('@')[0]
-                    info += f"Autonomous Vehicle {vehicle_id} is significantly faster than the Leading Autonomous Vehicle ({leader_id}),\n speed difference: {speed_difference}\n"
+                if vehicle_type == 'auto' and leader_type == 'auto':
+                    if speed_difference > MAX_SPEED_DIFF:
+                        leader_type = traci.vehicle.getTypeID(leader_id).split('@')[0]
+                        if vehicle_type == 'auto' and leader_type == 'auto':
+                            info += f"Autonomous Vehicle{vehicle_id} is significantly faster than the Leading Autonomous Vehicle({leader_id}),\n speed difference: {speed_difference} km/h.\n"
+                            # traci.vehicle.setSpeed(vehicle_id, 5.0)  # Set speed to increase distance
+                            # new_speed_difference = vehicle_speed - traci.vehicle.getSpeed(leader_id)
+                            # info += f"Autonomous Vehicle {vehicle_id} increased distance from significantly faster than Leading Autonomous Vehicle, new speed difference: {new_speed_difference}\n \n \n"
+                        else:
+                            pass
+                    else:
+                        pass
+                else:
+                    pass
+        else:
+            pass
+    else:
+        pass
+    # Check for too close neighbor normal vehicle in a different lane
+    neighbors = traci.vehicle.getNeighbors(vehicle_id, 5)
+    for neighbor_id, _ in neighbors:
+        if neighbor_id in traci.vehicle.getIDList():
+            x2, y2 = traci.vehicle.getPosition(neighbor_id)
+            distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+            neighbor_type = traci.vehicle.getTypeID(neighbor_id).split('@')[0]
 
-        neighbors = traci.vehicle.getNeighbors(vehicle_id, 5)
-        for neighbor_id, _ in neighbors:
-            if neighbor_id in traci.vehicle.getIDList():
-                x2, y2 = traci.vehicle.getPosition(neighbor_id)
-                distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
-                neighbor_type = traci.vehicle.getTypeID(neighbor_id).split('@')[0]
-                info += f"Autonomous Vehicle {vehicle_id} is too close to a Neighbor Normal Vehicle ({neighbor_id}) in a different lane,\n distance: {distance}\n"
+            if vehicle_type == 'auto' and neighbor_type == 'car':
 
-        blockers = traci.vehicle.getNeighbors(vehicle_id, 1)
-        for blocker_id, _ in blockers:
-            if blocker_id != vehicle_id and blocker_id in traci.vehicle.getIDList():
-                x2, y2 = traci.vehicle.getPosition(blocker_id)
-                distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
-                blocker_type = traci.vehicle.getTypeID(blocker_id).split('@')[0]
-                info += f"Autonomous Vehicle {vehicle_id} is blocked by Normal Vehicle {blocker_id},\n distance: {distance}\n"
+                # Get the Distance of the autonomous vehicle
+                vehicle_distance = traci.vehicle.getDistance(vehicle_id)
+                neighbor_distance = traci.vehicle.getDistance(neighbor_id)
+
+                # Get the distance difference of the autonomous vehicle
+                distance_difference = vehicle_distance - neighbor_distance
+                distance_difference = abs(distance_difference)
+                info += f"Distance Difference between vehicle{vehicle_id} and Neighboring Normal vehicle{neighbor_id}: {distance_difference} m.\n"
+
+                # Get the speed of the autonomous vehicle
+                vehicle_speed = traci.vehicle.getSpeed(vehicle_id)
+                neighbor_speed = traci.vehicle.getSpeed(neighbor_id)
+
+                # Get the distance difference of the autonomous vehicle
+                speed_difference = vehicle_speed - neighbor_speed
+                speed_difference = abs(speed_difference)
+                info += f"Speed Difference between vehicle{vehicle_id} and Neighboring Normal vehicle{neighbor_id}: {speed_difference} km/h.\n"
+
+                if vehicle_type == 'auto' and neighbor_type == 'car':
+                    if speed_difference < MIN_LANE_CHANGE_DISTANCE:
+                        info += f"Autonomous Vehicle{vehicle_id} is too close to a Neighbor Normal Vehicle({neighbor_id}) in a different lane,\n distance: {distance_difference} m.\n"
+
+                        # If autonomous vehicle speed is greater than or equal to 25, decrease speed by 1
+                        if vehicle_speed >= 2:
+                            traci.vehicle.setSpeed(vehicle_id, vehicle_speed + 1)
+                            info += f"Autonomous Vehicle{vehicle_id} increased speed to {vehicle_speed + 1} km/h.\n"
+                            # Calculate new distance
+                            new_distance = speed_difference + 10
+                            info += f"Autonomous Vehicle{vehicle_id} increased distance from Neighbor Normal Vehicle in a different lane, new distance: {new_distance} m.\n \n \n"
+                        else:
+                            # If autonomous vehicle speed is less than 25, print actual speed and maintain distance
+                            info += f"Autonomous Vehicle{vehicle_id} actual speed is {vehicle_speed} km/h, maintaining distance.\n"
+                            # new_distance = traci.vehicle.getDistance(vehicle_id)
+                            info += f"Autonomous Vehicle{vehicle_id} maintaining distance from Neighbor Normal vehicle, Distance: {distance_difference} m.\n \n \n"
+
+                        # Check if the autonomous vehicle is blocked and change lane
+                        if not traci.vehicle.getNextTLS(vehicle_id) and not traci.vehicle.getLaneChangeState(vehicle_id, 0):  # 0 corresponds to 'left'
+                            # Get the best lane information
+                            best_lanes = traci.vehicle.getBestLanes(vehicle_id)
+                            if best_lanes:
+                                best_lane_id = best_lanes[0][0]  # Choose the first best lane
+                                best_lane_direction = best_lanes[0][2]  # Direction information
+                                current_lane_id = traci.vehicle.getLaneID(vehicle_id)
+                                if best_lane_id != current_lane_id:
+                                    info += f"Autonomous Vehicle {vehicle_id} is blocked. Changing lane to {best_lane_id}.\n"
+                                    traci.vehicle.changeLane(vehicle_id, best_lane_id, 10.0)  # Change to the best lane
+                                    traci.simulationStep()  # Allow the simulation to process the lane change
+                                    info += f"{vehicle_id} changed lane to {best_lane_id} in direction {best_lane_direction} to increase distance from Neighbor Normal Vehicle in a different lane\n \n \n"
 
     return info
+
 
 
 
@@ -602,7 +746,7 @@ if __name__ == "__main__":
     xml_file, route_id, num_auto_vehicles, num_all_vehicles, all_vehicle_elements = load_network_data()
 
     traci.start([sumoBinary, "-c", "demo_network.sumocfg", "--tripinfo-output", "tripinfo.xml"])
-    run(num_steps=100, xml_file=xml_file)
+    run(num_steps=200, xml_file=xml_file)
 
 
 
