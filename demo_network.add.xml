@@ -1,0 +1,57 @@
+<additionals>
+
+   <rerouter id="rerouter_2" edges="e3" probability="0.1">
+        <interval begin="0" end="2000">
+		      <destProbReroute id="e11"/>
+		    </interval>
+    </rerouter>
+
+     <rerouter id="rerouter_4" edges="e4" probability="0.1">
+        <interval begin="0" end="2000">
+		      <destProbReroute id="e5"/>
+		    </interval>
+    </rerouter>
+
+    <rerouter id="rerouter_5" edges="e5" probability="0.1">
+        <interval begin="0" end="2000">
+		      <destProbReroute id="e6"/>
+		    </interval>
+    </rerouter>
+
+    <rerouter id="rerouter_6" edges="e6" probability="0.1">
+        <interval begin="0" end="2000">
+		      <destProbReroute id="e7"/>
+		    </interval>
+    </rerouter> 
+
+    <rerouter id="rerouter_7" edges="e7" probability="0.1">
+        <interval begin="0" end="2000">
+		      <destProbReroute id="e9"/>
+		    </interval>
+    </rerouter>
+
+     <rerouter id="rerouter_8" edges="e2" probability="0.1">
+        <interval begin="0" end="2000">
+		      <destProbReroute id="e3"/>
+		    </interval>
+    </rerouter>     
+
+    <rerouter id="rerouter_9" edges="e9" probability="0.1">
+        <interval begin="0" end="2000">
+		      <destProbReroute id="e10"/>
+		    </interval>
+    </rerouter>
+
+    <rerouter id="rerouter_10" edges="e10" probability="0.1">
+        <interval begin="0" end="2000">
+		      <destProbReroute id="e2"/>
+		    </interval>
+    </rerouter>    
+   
+
+    <e1Detector id="det_0" lane="e1_0" pos="10" freq="500" file="det.out.xml" />
+    <e1Detector id="det_1" lane="e2_0" pos="10" freq="500" file="det.out.xml" />
+    <e1Detector id="det_2" lane="e2_0" pos="10" freq="500" file="det.out.xml" />
+    <!-- <e1Detector id="det_3" lane="e4_0" pos="10" freq="500" file="det.out.xml" /> -->
+
+</additionals>

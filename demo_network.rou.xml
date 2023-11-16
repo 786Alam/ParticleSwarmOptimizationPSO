@@ -1,0 +1,30 @@
+<routes>
+    <vType id="car" 
+            vClass="passenger" length="5" maxSpeed="30" carFollowModel="Krauss" color="255,204,0" accel="2.6" decel="4.5" 
+            sigma="1.0"/>
+
+    <vType id="auto" 
+            vClass="evehicle" length="5" maxSpeed="30" color="0,255,0" accel="2.6" decel="4.5" 
+            sigma="1.0"/>
+
+    <route id="route_0" edges="e0 e1 e2 e3 e4 e5 e6 e7 e9 e10 e2 e3 e11"/>
+    <route id="route_1" edges="e0 e1 e2 e3 e4 e5 e6 e7 e8 e1 e2 e3 e11"/>
+    <!-- <flow id="carflow" type="car" beg="0" end="0" number="10" from="e0" to="e11"/> -->
+        <!-- <flow id="autoflow" type="auto" beg="0" end="0" number="10" from="e0" to="e11"/> -->
+
+     <vehicle id="0" type="car" route="route_0" depart="0"/>
+     <vehicle id="1" type="car" route="route_0" depart="1"/>
+     <vehicle id="2" type="auto" route="route_0" depart="2"/>
+     <vehicle id="3" type="car" route="route_1" depart="3"/>
+     <vehicle id="4" type="car" route="route_0" depart="4"/>
+     <vehicle id="5" type="auto" route="route_0" depart="5"/>
+     <vehicle id="6" type="car" route="route_1" depart="6"/>
+     <vehicle id="7" type="car" route="route_0" depart="7"/>
+     <vehicle id="8" type="car" route="route_0" depart="8"/>
+     <vehicle id="9" type="auto" route="route_1" depart="9"/>
+     <vehicle id="10" type="car" route="route_0" depart="9"/>
+     <vehicle id="11" type="car" route="route_1" depart="10"/>
+     <vehicle id="12" type="auto" route="route_0" depart="10"/>
+     <vehicle id="13" type="car" route="route_1" depart="10"/>
+
+</routes>
