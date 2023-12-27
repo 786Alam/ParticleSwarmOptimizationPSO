@@ -1,0 +1,523 @@
+FUNCTION calculate_individual_interaction_score(vehicle_id)
+    Initialize collision counters and penalties to zero
+    Define minimum safe distances and penalties
+
+    IF vehicle_id is not in the simulation
+        RETURN zeros for all counters and an empty list for interaction details
+
+    Get the position and type of the current vehicle
+
+    Check for the following vehicle (follower)
+    IF there is a following vehicle
+        Calculate the distance between the current vehicle and the follower
+        IF the current vehicle is a PSO vehicle and the follower is a PSO or normal vehicle
+            Calculate the absolute distance and speed differences
+            IF the distance is too close
+                Calculate penalty based on distance
+                IF the speed difference is too high
+                    Increase the speed of the current vehicle to avoid collision
+                    Append the interaction detail about speed and distance increase
+                ELSE
+                    Increment the collision avoidance counter
+                    Append the interaction detail about maintaining distance
+                ENDIF
+            ELSE
+                Increment the collision avoidance counter
+                Append the interaction detail about maintaining distance
+            ENDIF
+        ENDIF
+    ENDIF
+
+    Check for the leading vehicle (leader)
+    IF there is a leading vehicle
+        Calculate the distance and speed difference with the leader
+        IF the current vehicle is a PSO vehicle and the leader is a PSO or normal vehicle
+            IF the distance is less than the safe distance
+                Apply a distance penalty
+                IF the speed difference is too high
+                    Adjust the current vehicle's speed to maintain a safe distance
+                    Append the interaction detail about speed decrease
+                    Increment the collision_leader_avoided counter
+                ELSE
+                    Append the interaction detail about maintaining distance
+                    Increment the collision_leader_avoided counter
+                ENDIF
+            ELSE
+                Append the interaction detail about maintaining safe distance with the leader
+                Increment the collision_leader_avoided counter
+            ENDIF
+        ENDIF
+    ENDIF
+
+  Check for neighboring vehicles
+    FOR each neighboring vehicle
+        Calculate the distance to the neighbor
+        IF the current vehicle is a PSO vehicle and the neighbor is a PSO or normal vehicle
+            IF the distance is less than the safe lane-changing distance
+                Apply a distance penalty
+                IF the speed difference is too high
+                    Adjust the current vehicle's speed to maintain a safe distance
+                    Append the interaction detail about speed and distance adjustment
+                    Increment the collision_neighbor_avoided counter
+                ELSE
+                    Append the interaction detail about maintaining distance
+                    Increment the collision_neighbor_avoided counter
+                ENDIF
+            ELSE
+                Append the interaction detail about maintaining a safe distance from the neighboring vehicle
+                Increment the collision_neighbor_avoided counter
+            ENDIF
+        ENDIF
+    ENDFOR
+
+     Check for blockers
+    FOR each potential blocker
+        IF the blocker is different from the current vehicle and is a PSO or normal vehicle
+            Perform distance checks
+            IF the current vehicle is blocked
+                Change lanes to avoid the blocker
+                Update the interaction details
+            ENDIF
+        ENDIF
+    ENDFOR
+
+    RETURN all collision counters, penalties, and interaction details
+END FUNCTION
+
+
+
+LATEX:
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
+
+\begin{document}
+
+\begin{lstlisting}[mathescape=true]
+FUNCTION calculate_individual_interaction_score(vehicle_id)
+    Initialize collision counters and penalties to zero
+    Define minimum safe distances and penalties
+
+    IF vehicle_id is not in the simulation
+        RETURN zeros for all counters and an empty list for interaction details
+
+    Get the position and type of the current vehicle
+
+    Check for the following vehicle (follower)
+    IF there is a following vehicle
+        Calculate the distance between the current vehicle and the follower
+        IF the current vehicle is a PSO vehicle and the follower is a PSO or normal vehicle
+            Calculate the absolute distance and speed differences
+            IF the distance is too close
+                Calculate penalty based on distance
+                IF the speed difference is too high
+                    Increase the speed of the current vehicle to avoid collision
+                    Append the interaction detail about speed and distance increase
+                ELSE
+                    Increment the collision avoidance counter
+                    Append the interaction detail about maintaining distance
+                ENDIF
+            ELSE
+                Increment the collision avoidance counter
+                Append the interaction detail about maintaining distance
+            ENDIF
+        ENDIF
+    ENDIF
+
+    Check for the leading vehicle (leader)
+    IF there is a leading vehicle
+        Calculate the distance and speed difference with the leader
+        IF the current vehicle is a PSO vehicle and the leader is a PSO or normal vehicle
+            IF the distance is less than the safe distance
+                Apply a distance penalty
+                IF the speed difference is too high
+                    Adjust the current vehicle's speed to maintain a safe distance
+                    Append the interaction detail about speed decrease
+                    Increment the collision_leader_avoided counter
+                ELSE
+                    Append the interaction detail about maintaining distance
+                    Increment the collision_leader_avoided counter
+                ENDIF
+            ELSE
+                Append the interaction detail about maintaining safe distance with the leader
+                Increment the collision_leader_avoided counter
+            ENDIF
+        ENDIF
+    ENDIF
+
+    Check for neighboring vehicles
+    FOR each neighboring vehicle
+        Calculate the distance to the neighbor
+        IF the current vehicle is a PSO vehicle and the neighbor is a PSO or normal vehicle
+            IF the distance is less than the safe lane-changing distance
+                Apply a distance penalty
+                IF the speed difference is too high
+                    Adjust the current vehicle's speed to maintain a safe distance
+                    Append the interaction detail about speed and distance adjustment
+                    Increment the collision_neighbor_avoided counter
+                ELSE
+                    Append the interaction detail about maintaining distance
+                    Increment the collision_neighbor_avoided counter
+                ENDIF
+            ELSE
+                Append the interaction detail about maintaining a safe distance from the neighboring vehicle
+                Increment the collision_neighbor_avoided counter
+            ENDIF
+        ENDIF
+    ENDFOR
+
+    Check for blockers
+    FOR each potential blocker
+        IF the blocker is different from the current vehicle and is a PSO or normal vehicle
+            Perform distance checks
+            IF the current vehicle is blocked
+                Change lanes to avoid the blocker
+                Update the interaction details
+            ENDIF
+        ENDIF
+    ENDFOR
+
+    RETURN all collision counters, penalties, and interaction details
+END FUNCTION
+\end{lstlisting}
+
+\end{document}
+
+
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
+
+\begin{document}
+
+\begin{lstlisting}[mathescape=true]
+FUNCTION calculate_interaction_scores()
+    Initialize dictionaries for collision avoidance counters and penalties
+
+    Get list of all vehicle IDs from the simulation
+
+    FOR each vehicle_id in all_vehicle_ids
+        Calculate interaction scores for the vehicle
+        Update collision avoidance counters and penalties in dictionaries
+    ENDFOR
+
+    RETURN dictionaries containing all collision counters, penalties, and interaction details
+END FUNCTION
+\end{lstlisting}
+
+\end{document}
+
+
+
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
+
+\begin{document}
+
+\begin{lstlisting}[mathescape=true]
+FUNCTION travel_times()
+    Initialize an empty dictionary for vehicle travel times
+
+    FOR each veh_id in the list of vehicle IDs from the simulation
+        Get the current simulation time
+        Get the departure time of the vehicle with veh_id
+        IF the departure time is valid
+            Calculate the travel time as the difference between current time and departure time
+            Store the travel time in the dictionary with veh_id as the key
+        ENDIF
+    ENDFOR
+
+    RETURN the dictionary of vehicle travel times
+END FUNCTION
+\end{lstlisting}
+
+\end{document}
+
+
+
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
+
+\begin{document}
+
+\begin{lstlisting}[mathescape=true]
+FUNCTION get_fitness(vehicle_id)
+    Retrieve interaction scores and travel time for the swarm of vehicles
+
+    Use the vehicle_id as the reference for travel time
+    Get the travel time for the reference vehicle
+    IF travel time is zero
+        RETURN infinity to avoid division by zero
+
+    Extract values from the interaction scores and penalties dictionaries for the reference vehicle
+
+    Calculate the fitness value using the formula:
+    fitness = 1 / travel_time + (
+        (collision_follower_avoided_val - fitness_penalty_follow_val) +
+        (collision_leader_avoided_val - fitness_penalty_lead_val) +
+        (collision_neighbor_avoided_val - fitness_penalty_neighbor_val) +
+        (change_lane_due_to_block_val - fitness_penalty_collision_val)
+    )
+
+    RETURN the calculated fitness
+END FUNCTION
+\end{lstlisting}
+
+\end{document}
+
+
+
+
+
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+The fitness value is calculated using the following formula:
+
+\[
+\text{fitness} = \frac{1}{\text{travel\_time}} + 
+\left( 
+    (\text{collision\_follower\_avoided\_val} - \text{fitness\_penalty\_follow\_val}) +
+    (\text{collision\_leader\_avoided\_val} - \text{fitness\_penalty\_lead\_val}) +
+    (\text{collision\_neighbor\_avoided\_val} - \text{fitness\_penalty\_neighbor\_val}) +
+    (\text{change\_lane\_due\_to\_block\_val} - \text{fitness\_penalty\_collision\_val})
+\right)
+\]
+
+\end{document}
+
+
+
+
+
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+The fitness value $f$ for a vehicle with a given travel time $t$ and various penalties and collision avoidance values is calculated as follows:
+
+\begin{equation}
+f = \frac{1}{t} + \left( (c_{fa} - p_{f}) + (c_{la} - p_{l}) + (c_{na} - p_{n}) + (c_{lb} - p_{c}) \right)
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $c_{t}$ is the travel time
+    \item $c_{fa}$ is the collision follower avoided value
+    \item $p_{f}$ is the fitness penalty for the follower
+    \item $c_{la}$ is the collision leader avoided value
+    \item $p_{l}$ is the fitness penalty for the leader
+    \item $c_{na}$ is the collision neighbor avoided value
+    \item $p_{n}$ is the fitness penalty for the neighbor
+    \item $c_{lb}$ is the change lane due to block value
+    \item $p_{c}$ is the fitness penalty for collision
+\end{itemize}
+
+\end{document}
+
+
+
+
+
+
+
+PSO Algorithm:
+
+FUNCTION pso_algorithm()
+    Initialize vehicle IDs for the swarm
+    Initialize positions, velocities, and personal bests for each vehicle
+    Determine the global best position based on the fitness of all positions
+    Get the global best fitness value
+    
+    Initialize a dictionary to store fitness values
+    
+    FOR each vehicle_id in the swarm
+        Update the velocity for the vehicle based on inertia, personal best, and global best
+        Ensure the velocity is non-negative
+        
+        Update the position for the vehicle based on the new velocity
+        
+        Evaluate the fitness for the new position
+        
+        IF the new fitness is better than the vehicle's current fitness
+            Update the vehicle's personal best position to the new position
+        ENDIF
+        
+        IF the new fitness is better than the global best fitness
+            Update the global best position to this vehicle's position
+            Update the global best fitness to the new fitness
+        ENDIF
+        
+        Store the new fitness value in the fitness values dictionary
+    ENDFOR
+    
+    RETURN the updated positions, velocities, personal bests, global best position, and global best fitness along with the fitness values dictionary
+END FUNCTION
+
+
+
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
+
+\begin{document}
+
+\begin{lstlisting}[mathescape=true]
+FUNCTION pso_algorithm()
+    Initialize vehicle IDs for the swarm
+    Initialize positions, velocities, and personal bests for each vehicle
+    Determine the global best position based on the fitness of all positions
+    Get the global best fitness value
+
+    Initialize a dictionary to store fitness values
+
+    FOR each vehicle_id in the swarm
+        Update the velocity for the vehicle based on inertia, personal best, and global best
+        Ensure the velocity is non-negative
+
+        Update the position for the vehicle based on the new velocity
+
+        Evaluate the fitness for the new position
+
+        IF the new fitness is better than the vehicle's current fitness
+            Update the vehicle's personal best position to the new position
+        ENDIF
+
+        IF the new fitness is better than the global best fitness
+            Update the global best position to this vehicle's position
+            Update the global best fitness to the new fitness
+        ENDIF
+
+        Store the new fitness value in the fitness values dictionary
+    ENDFOR
+
+    RETURN the updated positions, velocities, personal bests, global best position, and global best fitness along with the fitness values dictionary
+END FUNCTION
+\end{lstlisting}
+
+\end{document}
+
+
+
+FUNCTION initialize_positions_and_velocities(vehicle_ids)
+    Initialize empty dictionaries for positions, velocities, and personal bests
+
+    FOR each vehicle_id in vehicle_ids
+        Generate a random position (x, y) within a defined range
+        Generate a random velocity within a defined range
+
+        Assign the random position to the vehicle in the positions dictionary
+        Assign the random velocity to the vehicle in the velocities dictionary
+        Set the initial personal best position for the vehicle to its initial position
+    ENDFOR
+
+    RETURN the dictionaries containing positions, velocities, and personal bests for all vehicles
+END FUNCTION
+
+
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
+
+\begin{document}
+
+\begin{lstlisting}[mathescape=true]
+FUNCTION initialize_positions_and_velocities(vehicle_ids)
+    Initialize empty dictionaries for positions, velocities, and personal bests
+
+    FOR each vehicle_id in vehicle_ids
+        Generate a random position (x, y) within a defined range
+        Generate a random velocity within a defined range
+
+        Assign the random position to the vehicle in the positions dictionary
+        Assign the random velocity to the vehicle in the velocities dictionary
+        Set the initial personal best position for the vehicle to its initial position
+    ENDFOR
+
+    RETURN the dictionaries containing positions, velocities, and personal bests for all vehicles
+END FUNCTION
+\end{lstlisting}
+
+\end{document}
+
+
+
+
+
+FUNCTION run_pso_experiment()
+    Initialize vehicle IDs for the swarm
+
+    Get a list of all edges from the simulation and choose one at random
+
+    Initialize an empty list to store result data for exporting to a CSV file
+
+    FOR each iteration in the range of total iterations
+        Step the simulation forward
+        Display vehicles that have entered and left the simulation
+
+        Execute the PSO algorithm to update positions, velocities, and bests
+        Calculate interaction scores for all vehicles
+
+        Retrieve distances, speeds, and travel times for all vehicles
+
+        Print or process the current iteration's data
+
+        Append the iteration's data to the results list
+
+    END FOR
+
+    Convert the results list to a DataFrame and save it to a CSV file
+    Close the simulation and flush the system output
+
+END FUNCTION
+
+
+
+
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{listings}
+
+\begin{document}
+
+\begin{lstlisting}[mathescape=true]
+FUNCTION run_pso_experiment()
+    Initialize vehicle IDs for the swarm
+
+    Get a list of all edges from the simulation and choose one at random
+
+    Initialize an empty list to store result data for exporting to a CSV file
+
+    FOR each iteration in the range of total iterations
+        Step the simulation forward
+        Display vehicles that have entered and left the simulation
+
+        Execute the PSO algorithm to update positions, velocities, and bests
+        Calculate interaction scores for all vehicles
+
+        Retrieve distances, speeds, and travel times for all vehicles
+
+        Print or process the current iteration's data
+
+        Append the iteration's data to the results list
+
+    END FOR
+
+    Convert the results list to a DataFrame and save it to a CSV file
+    Close the simulation and flush the system output
+
+END FUNCTION
+\end{lstlisting}
+
+\end{document}

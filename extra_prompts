@@ -1,0 +1,311 @@
+Chat lets get something straight again.
+
+You asked my the following questions to which I replied:
+
+What kind of information or details are you interested in visualizing or tracking for the PSO-controlled vehicles in the swarm?
+
+Ans: I am interested in tracking and visualizing the collisions avoidance (collision_follower_avoided, collision_leader_avoided, collision_neighbor_avoided, change_lane_due_to_block) and how they are improved over as iterations goes on. I need to depict them gradually increasing over time(as the simulation goes on, that depicts the collisions being avoided and lane changing when blocked). Remember to do this for only pso_{i} id vehicles(i.e: i can be any number from 0 till 50) or quite simply (auto) type vehicle.
+
+Are there specific metrics or criteria you would like to focus on when evaluating the performance of these vehicles in terms of collision avoidance and lane changes?
+
+Ans: I want to clearly depict that overtime as simulation goes on as the pso_{i} vehicles/type auto vehicles/particles in swarm are in the simulation, they have higher numbers of these (collision_follower_avoided, collision_leader_avoided, collision_neighbor_avoided, change_lane_due_to_block) that shows that the particles are learning. We can do this by depicting them against iterations and travel_time seperately. Function for travel time could be as follows:
+
+def travel_times():
+    vehicle_travel_times = {}
+    for veh_id in traci.vehicle.getIDList():
+        time = traci.simulation.getTime()
+        depart_time = traci.vehicle.getDeparture(veh_id)
+        if depart_time >= 0:
+            travel_time = time - depart_time
+            vehicle_travel_times[veh_id] = travel_time
+
+    return vehicle_travel_times
+
+Do you have any specific requirements for visualizing the learning progress or results over iterations?
+
+Ans:  Best plot in a line chart  that shows the line going up over iteration and travel time.
+
+Alright now code or if you have any further questions, ask.
+
+
+Then you gave me this skeleton:
+
+import traci
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Initialize PSO parameters and swarm
+# ...
+
+# Variables to track metrics over iterations
+iterations = []
+collision_follower_avoided_list = []
+collision_leader_avoided_list = []
+collision_neighbor_avoided_list = []
+change_lane_due_to_block_list = []
+travel_time_list = []
+
+# PSO iterations
+for iteration in range(num_iterations):
+    # PSO optimization step
+    # ...
+
+    # Simulate the swarm and calculate metrics
+    # ...
+
+    # Track metrics for each PSO-controlled vehicle
+    for pso_vehicle_id in range(num_pso_vehicles):
+        # Get metrics for the pso_vehicle_id
+        collision_follower_avoided, collision_leader_avoided, collision_neighbor_avoided, change_lane_due_to_block, _ = \
+            calculate_individual_interaction_score(f'pso_{pso_vehicle_id}', all_vehicle_ids)
+
+        # Get travel time for the pso_vehicle_id
+        travel_time = travel_times().get(f'pso_{pso_vehicle_id}', 0)
+
+        # Update lists
+        iterations.append(iteration)
+        collision_follower_avoided_list.append(collision_follower_avoided)
+        collision_leader_avoided_list.append(collision_leader_avoided)
+        collision_neighbor_avoided_list.append(collision_neighbor_avoided)
+        change_lane_due_to_block_list.append(change_lane_due_to_block)
+        travel_time_list.append(travel_time)
+
+# Plotting
+plt.figure(figsize=(10, 6))
+
+plt.subplot(2, 1, 1)
+plt.plot(iterations, collision_follower_avoided_list, label='Follower Avoidance')
+plt.plot(iterations, collision_leader_avoided_list, label='Leader Avoidance')
+plt.plot(iterations, collision_neighbor_avoided_list, label='Neighbor Avoidance')
+plt.plot(iterations, change_lane_due_to_block_list, label='Lane Change Due to Block')
+
+plt.title('Collision Avoidance and Lane Change Metrics Over Iterations')
+plt.xlabel('Iterations')
+plt.ylabel('Count')
+plt.legend()
+
+plt.subplot(2, 1, 2)
+plt.plot(iterations, travel_time_list, label='Travel Time')
+
+plt.title('Travel Time Over Iterations')
+plt.xlabel('Iterations')
+plt.ylabel('Travel Time (s)')
+
+plt.tight_layout()
+plt.show()
+
+
+And Now all I am asking you is where does the part where my PSO logic is being calculated goes along with the skeleton you provided.
+
+My logic:
+
+# Function to read route information from the XML file
+def read_routes_from_xml(file_path):
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+
+    routes = {}
+    for route_elem in root.findall('.//route'):
+        route_id = route_elem.get('id')
+        route_edges = route_elem.get('edges').split()
+        routes[route_id] = route_edges
+
+    return routes
+
+
+# Generate PSO-controlled vehicles in the route file
+def generate_pso_vehicles(route_info):
+    pso_vehicles = ""
+    for i in range(SWARM_SIZE):
+        route_id = f"route_{i % 2}"
+        valid_edges = route_info.get(route_id, [])
+        if valid_edges:
+            depart_time = random.uniform(1, 30)
+            pso_vehicles += f' <vehicle id="pso_{i}" type="auto" route="{route_id}" depart="{depart_time}" begin="200" end="1000000" from="e1" to="e8" />\n'
+
+    return pso_vehicles
+
+
+
+# Initialize simulation
+def initialize_simulation():
+    options = get_options()
+    if options.nogui:
+        sumo_binary = checkBinary('sumo')
+    else:
+        sumo_binary = checkBinary('sumo-gui')
+
+    try:
+        traci.start([sumo_binary, "-c", "demo_network.sumocfg","--random-depart-offset", "100", "--tripinfo-output", "tripinfo.xml"])
+    except Exception as e:
+        print(f"Error starting Sumo: {e}")
+        sys.exit()
+
+
+def get_options():
+    opt_parser = optparse.OptionParser()
+    opt_parser.add_option("--nogui", action="store_true", default=False, help="run the commandline version of sumo")
+    options, args = opt_parser.parse_args()
+    return options
+
+
+
+def set_initial_parameters(route_info):
+    traci.simulationStep(BURN_IN_PERIOD)
+    traci.simulationStep()  # To continue the simulation
+
+    for i in range(SWARM_SIZE):
+        vehicle_id = f"pso_{i}"
+        route_id = f"route_{i % 2}"
+        route_edges = route_info.get(route_id, [])
+
+        # Check if the route already exists, if not, add it
+        if route_id not in traci.route.getIDList():
+            try:
+                traci.route.add(route_id, route_edges)
+            except traci.exceptions.TraCIException as e:
+                print(f"Error adding route '{route_id}': {e}")
+
+        try:
+            traci.vehicle.add(vehicle_id, route_id, departLane="random", departPos="base")
+        except traci.exceptions.TraCIException as e:
+            print(f"Error adding vehicle '{vehicle_id}': {e}")
+
+        traci.vehicle.setType(vehicle_id, "car")
+        traci.vehicle.setColor(vehicle_id, (0, 0, 255))  # Set color to blue
+        traci.vehicle.setMinGap(vehicle_id, np.random.uniform(0.1, 5))
+        traci.vehicle.setLaneChangeMode(vehicle_id, 512)  # Disable lane changing for PSO vehicles
+
+        # Set the initial speed separately
+        traci.vehicle.setSpeed(vehicle_id, 25)  # Set to the maximum speed
+
+    print("List of vehicles after addition:", traci.vehicle.getIDList())  # Print list of vehicles for debugging
+    print("List of routes after addition:", traci.route.getIDList())  # Print list of routes for debugging
+    traci.simulationStep(BURN_IN_PERIOD)
+    traci.simulationStep()
+
+
+
+def evaluate_particle(particle):
+    for step in range(SIMULATION_STEPS):
+        print(f"Simulation Step: {step}")
+        traci.simulationStep()
+
+        if step % SLOWDOWN_INTERVAL == 0:
+            for i in range(SWARM_SIZE):
+                vehicle_id = f"pso_{i}"
+                if traci.vehicle.getIDList() and vehicle_id in traci.vehicle.getIDList():
+                    traci.vehicle.setSpeedMode(vehicle_id, 0b000001000)
+                else:
+                    print(f"Vehicle {vehicle_id} not found.")
+                    # print("List of vehicles:", traci.vehicle.getIDList())
+
+        for i in range(SWARM_SIZE):
+            try:
+                vehicle_id = f"pso_{i}"
+                if vehicle_id in traci.vehicle.getIDList():
+                    traci.vehicle.setSpeed(vehicle_id, particle[0])
+                    traci.vehicle.setMinGap(vehicle_id, particle[1])
+                    traci.vehicle.setParameter(vehicle_id, "slowDown", str(particle[2]))
+                else:
+                    print(f"Vehicle {vehicle_id} not found.")
+                    # print("List of vehicles:", traci.vehicle.getIDList())
+            except traci.exceptions.TraCIException as e:
+                print(f"Error setting parameters for {vehicle_id}: {e}")
+
+        # Check if the list of vehicles is empty and end the simulation
+        if not traci.vehicle.getIDList():
+            print("List of vehicles is empty. Ending simulation.")
+            break
+
+        # Ensure that the simulation stops when SIMULATION_STEPS is reached
+        if step == SIMULATION_STEPS - 1:
+            break
+
+    # Ensure that the simulation stops
+    for _ in range(10):
+        traci.simulationStep()
+
+    fitness = get_fitness()
+    print(f"Final Fitness: {fitness}")
+    return fitness
+
+
+
+def get_fitness():
+    merges = traci.simulation.getCollidingVehiclesNumber()
+    collisions = traci.simulation.getArrivedNumber()
+    fitness = merges - PENALTY_PARAMETER * collisions
+    return fitness
+
+
+
+def update_velocity(particle, personal_best, global_best, velocity_memory):
+    inertia_term = INERTIA * np.array(particle[3:])
+    personal_best_term = LOCAL_WEIGHT * np.random.random() * (np.array(personal_best[3:]) - np.array(particle[3:]))
+    global_best_term = GLOBAL_WEIGHT * np.random.random() * (np.array(global_best[3:]) - np.array(particle[3:]))
+    memory_term = np.random.random() * (velocity_memory - np.array(particle[3:]))
+    particle[3:] = inertia_term + personal_best_term + global_best_term + memory_term
+
+
+def update_position(particle):
+    particle[0] = max(0, min(25, particle[0]))  # Ensure speed is within [0, 25]
+    particle[1] = max(0.1, min(5, particle[1]))  # Ensure minGap is within [0.1, 5]
+    particle[2] = max(5, min(25, particle[2]))  # Ensure slowDown is within [5, 25]
+
+
+def run_pso_experiment():
+    global_best_particle = np.random.uniform(low=[0, 0.1, 5], high=[25, 5, 25], size=3).tolist()
+    global_best_particle.extend(np.random.rand(3).tolist())  # Append velocity terms
+
+    velocity_memory = np.zeros(3)  # Initialize memory for velocity
+
+    # Lists to store data for plotting
+    fitness_history = []
+    global_best_history = []
+
+    # Initialize an empty NumPy array for particle fitness history
+    particle_fitness_history = np.zeros((MAX_ITERATIONS, SWARM_SIZE))
+
+    for iteration in range(MAX_ITERATIONS):
+        print(f"Iteration: {iteration + 1}/{MAX_ITERATIONS}")
+
+        for i in range(SWARM_SIZE):
+            particle = np.random.uniform(low=[0, 0.1, 5], high=[25, 5, 25], size=3).tolist()
+            particle.extend(np.random.rand(3).tolist())  # Append velocity terms
+            update_velocity(particle, particle, global_best_particle, velocity_memory)
+            update_position(particle)
+
+            fitness = evaluate_particle(particle)
+
+            if global_best_particle is None or fitness > get_fitness():
+                global_best_particle = np.copy(particle)
+
+            update_velocity(particle, particle, global_best_particle, velocity_memory)
+            update_position(particle)
+
+            # Update memory with current velocity
+            velocity_memory = np.array(particle[3:])
+
+            # Save fitness value to particle fitness history
+            particle_fitness_history[iteration, i] = fitness
+
+            # Save data for plotting
+            fitness_history.append(fitness)
+            global_best_history.append(get_fitness())
+
+        traci.simulationStep()  # Run a simulation step
+
+        # Add a condition to break out of the loop when reaching the desired simulation steps
+        if traci.simulation.getTime() >= SIMULATION_STEPS:
+            break
+
+    # Ensure that the simulation stops at the specified number of steps
+    while traci.simulation.getMinExpectedNumber() > 0:
+        traci.simulationStep()
+
+    traci.close()
+    sys.stdout.flush()
+
+
+DON't you UNDERSTAND? I want you to generate the whole thing except the "calculate_individual_interaction_score" and "travel_time" functions....just put a placeholder so i know where to place them.

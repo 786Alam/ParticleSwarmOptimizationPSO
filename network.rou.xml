@@ -1,0 +1,22 @@
+
+<routes>
+    <vType id="car" 
+            vClass="passenger" length="5" maxSpeed="15" carFollowModel="Krauss" color="255,204,0" accel="2.6" decel="4.5" maxSpeed="70"  safety="none" 
+            sigma="1.0"/>
+
+    <route id="route_0" edges="e1 e2 e3 e4 e5 e6 e7 e9 e10 e2 e3 e12 e13 e14"/>
+    <route id="route_1" edges="e1 e2 e3 e4 e5 e6 e7 e8 e1 e2 e3 e12 e13 e14"/>
+
+        <vehicle id="pso_0" type="car" route="route_0" depart="0" />
+    <vehicle id="pso_1" type="car" route="route_1" depart="1" />
+    <vehicle id="pso_2" type="car" route="route_0" depart="2" />
+    <vehicle id="pso_3" type="car" route="route_1" depart="3" />
+    <vehicle id="pso_4" type="car" route="route_0" depart="4" />
+    <vehicle id="pso_5" type="car" route="route_1" depart="5" />
+    <vehicle id="pso_6" type="car" route="route_0" depart="6" />
+    <vehicle id="pso_7" type="car" route="route_1" depart="7" />
+    <vehicle id="pso_8" type="car" route="route_0" depart="8" />
+    <vehicle id="pso_9" type="car" route="route_1" depart="9" />
+
+
+</routes>

@@ -1,57 +1,173 @@
-<additionals>
+<!-- <additionals>
 
-   <rerouter id="rerouter_2" edges="e3" probability="0.1">
-        <interval begin="0" end="2000">
-		      <destProbReroute id="e11"/>
+
+  <rerouter id="loop_rerouter1" edges="e8" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e1"/>
+    </interval>
+  </rerouter>
+
+  <rerouter id="loop_rerouter2" edges="e1" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e2"/>
+    </interval>
+  </rerouter>
+
+  <rerouter id="loop_rerouter3" edges="e2" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e3"/>
+    </interval>
+  </rerouter>
+
+  
+  <rerouter id="loop_rerouter4" edges="e3" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e4"/>
+    </interval>
+  </rerouter>
+
+  
+  <rerouter id="loop_rerouter5" edges="e4" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e5"/>
+    </interval>
+  </rerouter>
+
+  <rerouter id="loop_rerouter6" edges="e5" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e6"/>
+    </interval>
+  </rerouter>
+
+  <rerouter id="loop_rerouter7" edges="e6" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e7"/>
+    </interval>
+  </rerouter>
+
+  <rerouter id="loop_rerouter8" edges="e7" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e8"/>
+    </interval>
+  </rerouter>
+
+
+    <rerouter id="rerouter_11" edges="m1" probability="1.0">
+        <interval begin="0" end="1000">
+		      <destProbReroute id="m3"/>
 		    </interval>
     </rerouter>
 
-     <rerouter id="rerouter_4" edges="e4" probability="0.1">
-        <interval begin="0" end="2000">
-		      <destProbReroute id="e5"/>
-		    </interval>
-    </rerouter>
-
-    <rerouter id="rerouter_5" edges="e5" probability="0.1">
-        <interval begin="0" end="2000">
-		      <destProbReroute id="e6"/>
-		    </interval>
-    </rerouter>
-
-    <rerouter id="rerouter_6" edges="e6" probability="0.1">
-        <interval begin="0" end="2000">
-		      <destProbReroute id="e7"/>
-		    </interval>
-    </rerouter> 
-
-    <rerouter id="rerouter_7" edges="e7" probability="0.1">
-        <interval begin="0" end="2000">
-		      <destProbReroute id="e9"/>
-		    </interval>
-    </rerouter>
-
-     <rerouter id="rerouter_8" edges="e2" probability="0.1">
-        <interval begin="0" end="2000">
-		      <destProbReroute id="e3"/>
-		    </interval>
-    </rerouter>     
-
-    <rerouter id="rerouter_9" edges="e9" probability="0.1">
-        <interval begin="0" end="2000">
-		      <destProbReroute id="e10"/>
-		    </interval>
-    </rerouter>
-
-    <rerouter id="rerouter_10" edges="e10" probability="0.1">
-        <interval begin="0" end="2000">
+    <rerouter id="rerouter_12" edges="m3" probability="1.0">
+        <interval begin="0" end="1000">
 		      <destProbReroute id="e2"/>
-		    </interval>
-    </rerouter>    
+		</interval>
+    </rerouter>       
    
 
-    <e1Detector id="det_0" lane="e1_0" pos="10" freq="500" file="det.out.xml" />
-    <e1Detector id="det_1" lane="e2_0" pos="10" freq="500" file="det.out.xml" />
-    <e1Detector id="det_2" lane="e2_0" pos="10" freq="500" file="det.out.xml" />
-    <!-- <e1Detector id="det_3" lane="e4_0" pos="10" freq="500" file="det.out.xml" /> -->
+    <e1Detector id="det_0" lane="e2_0" pos="10" freq="500" file="det.out.xml" />
+    <e1Detector id="det_1" lane="e2_1" pos="10" freq="500" file="det.out.xml" />
+    <e1Detector id="det_2" lane="e2_2" pos="10" freq="500" file="det.out.xml" />
+
+</additionals> -->
+
+
+
+
+
+
+
+
+<!-- FOR TRAFFIC JAME SCENARIO: -->
+
+
+<additionals>
+
+  <rerouter id="loop_rerouter1" edges="e8" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e1"/>
+    </interval>
+  </rerouter>
+
+  <rerouter id="loop_rerouter2" edges="e1" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e2"/>
+    </interval>
+  </rerouter>
+
+  <rerouter id="loop_rerouter3" edges="e2" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e3"/>
+    </interval>
+  </rerouter>
+
+  
+  <rerouter id="loop_rerouter4" edges="e3" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e4"/>
+    </interval>
+  </rerouter>
+
+  
+  <rerouter id="loop_rerouter5" edges="e4" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e5"/>
+    </interval>
+  </rerouter>
+
+  <rerouter id="loop_rerouter6" edges="e5" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e6"/>
+    </interval>
+    <vehicleTypes>
+        <vType type="auto"/>
+    </vehicleTypes>
+  </rerouter>
+
+  <rerouter id="loop_rerouter7" edges="e6" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e7"/>
+    </interval>
+  </rerouter>
+
+  <rerouter id="loop_rerouter8" edges="e7" probability="1.0">
+    <interval begin="0" end="5000">
+        <destProbReroute id="e8"/>
+    </interval>
+  </rerouter>
+
+
+  <rerouter id="loop_rerouter5.5" edges="e5" probability="0.1">
+      <interval begin="0" end="5000">
+          <destProbReroute id="m1"/>
+      </interval>
+      <vehicleTypes>
+          <vType type="car"/>
+      </vehicleTypes>
+  </rerouter>
+
+
+
+
+
+
+    <rerouter id="rerouter_11" edges="m1" probability="1.0">
+        <interval begin="0" end="1000">
+		      <destProbReroute id="m3"/>
+		    </interval>
+    </rerouter>
+
+    <rerouter id="rerouter_12" edges="m3" probability="1.0">
+        <interval begin="0" end="1000">
+		      <destProbReroute id="e2"/>
+		</interval>
+    </rerouter>       
+   
+
+    <e1Detector id="det_0" lane="e2_0" pos="10" freq="500" file="det.out.xml" />
+    <e1Detector id="det_1" lane="e2_1" pos="10" freq="500" file="det.out.xml" />
+    <e1Detector id="det_2" lane="e2_2" pos="10" freq="500" file="det.out.xml" />
 
 </additionals>
+
+

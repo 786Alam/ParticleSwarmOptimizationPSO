@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2023-10-31 07:58:56 by Eclipse SUMO netedit Version 1.17.0
+<!-- generated on 2023-12-17 10:29:54 by Eclipse SUMO netedit Version 1.17.0
 -->
 
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <sumocfg-file value="demo_network.sumocfg"/>
         <sumo-net-file value="demo_network.net.xml"/>
     </input>
 
